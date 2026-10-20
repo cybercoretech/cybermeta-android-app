@@ -165,8 +165,10 @@ const tickerItems = [
   ["LENS SERIAL", "0042017"], ["CITY", "Portland"], ["MOTION VIDEO", "2.1 MB"], ["THUMBNAIL", "160×120"], ["SOFTWARE", "Gallery 15.1"],
 ];
 const track = document.querySelector("#ticker");
+if (track) {
 const tickerHtml = tickerItems.map(([k, v]) => `<span><b>${k}</b> ${v} <i>→ REMOVED</i></span>`).join("");
 track.innerHTML = tickerHtml + tickerHtml;
+}
 
 // ------------------------------------------------------------ leak cards --
 const LEAKS = [
@@ -205,7 +207,7 @@ const LEAKS = [
 ];
 const sevName = { high: "HIGH", med: "MEDIUM", low: "LOW" };
 const grid = document.querySelector("#leakGrid");
-LEAKS.forEach((l, i) => {
+if (grid) LEAKS.forEach((l, i) => {
   const b = document.createElement("button");
   b.type = "button";
   b.className = `leak reveal sev-${l.sev} d${i % 4}`;
@@ -254,13 +256,14 @@ function showView(i) {
   views.forEach((v, k) => v.classList.toggle("on", k === i));
   steps.forEach((s, k) => s.classList.toggle("active", k === i));
 }
-function cyclePhone() { clearInterval(phoneTimer); phoneTimer = setInterval(() => showView((viewIdx + 1) % views.length), 4200); }
+function cyclePhone() { if (!views.length) return; clearInterval(phoneTimer); phoneTimer = setInterval(() => showView((viewIdx + 1) % views.length), 4200); }
 steps.forEach((s, i) => s.addEventListener("click", () => { showView(i); cyclePhone(); }));
 cyclePhone();
 
 // --------------------------------------------------------------- install --
 const REPO = "https://github.com/cybercoretech/cybermeta-android-app";
-const CMDS = {
+// A page can set window.CM_CMDS before this script to use its own commands.
+const CMDS = window.CM_CMDS || {
   curl: ["curl -fsSL https://raw.githubusercontent.com/cybercoretech/cybermeta-android-app/main/install.sh | sh"],
   manual: [
     `curl -fLO ${REPO}/releases/latest/download/cybermeta.apk`,
@@ -287,7 +290,7 @@ function showCmds(key) {
   }));
 }
 document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => showCmds(t.dataset.cmd)));
-showCmds("curl");
+if (cmds) showCmds(Object.keys(CMDS)[0]);
 
 // ------------------------------------------------------ background bits --
 (() => {
@@ -318,6 +321,7 @@ showCmds("curl");
 // ------------------------------------------------------------ hero scene --
 (() => {
   const c = document.querySelector("#hero");
+  if (!c) return;
   const g = c.getContext("2d");
   const W = 900, H = 900;
   const photo = { x: 200, y: 270, w: 500, h: 360, r: 26 };
