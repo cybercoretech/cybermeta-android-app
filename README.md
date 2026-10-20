@@ -90,7 +90,10 @@ Release signing certificate (SHA-256):
 88:39:05:95:F5:FB:F1:71:DC:03:D0:40:AB:C8:ED:C2:A7:FB:9E:97:33:20:B3:C4:BB:E7:25:D4:13:9B:28:3C
 ```
 
-For update notifications, add `https://github.com/cybercoretech/cybermeta-android-app`
+**Automatic updates:** add the Cybercore F-Droid repository at
+<https://cybercoretech.github.io/fdroid/> and install Cybermeta from there
+(direct link: <https://cybercoretech.github.io/fdroid/#app=dev.cybercore.cybermeta>).
+It serves this same signed release. Or add `https://github.com/cybercoretech/cybermeta-android-app`
 to [Obtainium](https://github.com/ImranR98/Obtainium).
 
 ## 🎨 Themes
