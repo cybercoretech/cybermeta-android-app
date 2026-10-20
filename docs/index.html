@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cybermeta for Android</title>
+  <meta name="description" content="Your photos tell everyone where you were, which phone you own and when. Cybermeta for Android shows you what they give away and removes it losslessly, with no internet permission.">
+  <meta name="theme-color" content="#070a09">
+  <meta property="og:title" content="Cybermeta for Android: make your photos stop talking">
+  <meta property="og:description" content="See what your photos give away. Remove it without losing quality. No internet permission, verified clean, open source.">
+  <meta property="og:image" content="https://cybercoretech.github.io/cybermeta-android-app/assets/social.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<canvas class="backdrop" id="particles" aria-hidden="true"></canvas>
+<div class="grid-floor" aria-hidden="true"></div>
+<div class="cursor-glow" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/icon.svg" alt=""><span>CYBERMETA<br><small>FOR ANDROID</small></span></a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#leaks">LEAKS</a><a href="#lab">LIVE LAB</a><a href="#app">THE APP</a><a href="#trust">TRUST</a><a href="#install">INSTALL</a>
+    </nav>
+    <div class="theme-picker">
+      <span class="theme-label">CYBERGRID</span>
+      <button id="themeButton" class="theme-button" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="themeMenu">LOADING THEMES…</button>
+      <div id="themeMenu" class="theme-menu" role="listbox" aria-label="Choose a Cybercore theme" hidden></div>
+      <select id="themeSelect" aria-label="Choose a Cybercore theme" tabindex="-1"></select>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">PHOTO PRIVACY · ANDROID 11+ · OPEN SOURCE</p>
+        <h1><span class="glitch" data-text="Your photos talk.">Your photos talk.</span><br>Make them <span class="redact">stop.</span></h1>
+        <p class="lede">Every photo you send can carry <strong>where you stood</strong>, <strong>which phone you own</strong>, <strong>your name</strong> and <strong>the second you pressed the shutter</strong>. Cybermeta shows you exactly what's inside, then strips it out without touching a single pixel.</p>
+        <div class="cta">
+          <a class="btn primary" href="#install">⬇ GET THE APP</a>
+          <a class="btn hot" href="#lab">▶ TRY IT ON A PHOTO</a>
+        </div>
+        <div class="trust">
+          <span>NO INTERNET PERMISSION</span><span>VERIFIED CLEAN</span><span>LOSSLESS</span><span>MIT LICENSED</span>
+        </div>
+      </div>
+      <div class="stage reveal" aria-label="Animation: metadata tags being scrubbed off a photo">
+        <canvas id="hero" width="900" height="900"></canvas>
+        <div class="stage-hud"><span>SCAN <b id="hudState">ACTIVE</b></span><span id="hudCount">9 LEAKS</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="ticker"></div>
+  </div>
+
+  <section class="section" id="leaks">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">01 / WHAT A PHOTO GIVES AWAY</p>
+        <h2>It's not just GPS.<br><em>It's everything around the picture.</em></h2>
+        <p>"Remove location" switches only touch one corner of the file. These are the places Cybermeta looks. Tap any card for the details.</p>
+      </div>
+      <div class="leaks" id="leakGrid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="lab">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">02 / LIVE LAB</p>
+        <h2>Drop a photo.<br><em>Watch it get scrubbed.</em></h2>
+        <p>This runs entirely in your browser: the photo never leaves your device. It's a small JavaScript version of the scan; the app runs the full Rust engine and double-checks its own work.</p>
+      </div>
+      <div class="lab reveal">
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept="image/jpeg">
+          <img class="preview" id="preview" alt="">
+          <p class="big">Drop a JPEG here</p>
+          <small>or tap to choose one · stays on your device</small>
+          <span class="local">🔒 100% LOCAL · NOTHING IS UPLOADED</span>
+          <button class="btn hot" type="button" id="sample">USE A LEAKY SAMPLE</button>
+        </label>
+        <div class="console" aria-live="polite">
+          <div class="console-bar"><i></i><i></i><i></i>&nbsp; cybermeta audit <span id="fname">—</span><span class="risk" id="risk"></span></div>
+          <div class="blockmap" id="blockmap"><span class="pic" style="flex-grow:1"></span></div>
+          <div class="blockmap-legend"><span><b>■</b> picture</span><span><em>■</em> metadata</span><span id="sizes"></span></div>
+          <div class="console-body" id="out"><div class="muted">waiting for a photo…</div></div>
+          <div class="console-actions">
+            <button class="btn primary" type="button" id="scrub" disabled>⚡ SCRUB IT</button>
+            <a class="btn" id="download" download hidden>⬇ DOWNLOAD CLEAN COPY</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="app">
+    <div class="wrap showcase">
+      <div>
+        <div class="section-head reveal">
+          <p class="eyebrow">03 / THE APP</p>
+          <h2>Share in. Clean. <em>Share out.</em></h2>
+          <p>Cybermeta sits in your share sheet. Send photos to it from Gallery or Photos, see the report, and send clean copies on: to a chat, an email, a marketplace listing.</p>
+        </div>
+        <div class="steps reveal" id="steps">
+          <div class="step active" data-view="0"><b>01</b><div><h3>Pick or share photos</h3><p>Up to 100 at once, from the photo picker, your files, or any app's share button.</p></div></div>
+          <div class="step" data-view="1"><b>02</b><div><h3>See what they give away</h3><p>A risk badge per photo, grouped findings, GPS shown as the pin a stranger could drop.</p></div></div>
+          <div class="step" data-view="2"><b>03</b><div><h3>Clean and send</h3><p>Five modes: Share-safe, Location only, Anonymous camera, Pixels only, Shift dates. Then share, save, or replace the originals.</p></div></div>
+        </div>
+      </div>
+      <div class="phone reveal d2" aria-label="The Cybermeta app">
+        <div class="screen" id="screen">
+          <div class="view on">
+            <svg viewBox="0 0 108 108" width="110" height="110" style="margin:6px auto 0"><use href="#mark"/></svg>
+            <div class="ui-title">CYBERMETA</div>
+            <div class="ui-sub">See what your photos give away.<br>Then make it disappear.</div>
+            <div class="ui-btn p">▣ PICK PHOTOS</div>
+            <div class="ui-btn s">▤ BROWSE FILES</div>
+            <div class="ui-card"><b>No internet permission</b>Your photos can't leave the phone through it.</div>
+            <div class="ui-card"><b>Verified clean</b>Re-read by a second parser before you get it.</div>
+            <div class="ui-card"><b>No quality loss</b>The picture is copied byte for byte.</div>
+          </div>
+          <div class="view">
+            <div class="ui-card" style="border-color:var(--red)"><b style="font-size:15px">3 photos</b>27 things they give away <span class="pill h" style="float:right">HIGH RISK</span>
+              <div class="chips" style="margin-top:8px"><span class="chip">📍 5 where you were</span><span class="chip">👤 3 who you are</span><span class="chip">🎞 1 hidden data</span><span class="chip o">📷 6 your camera</span><span class="chip o">🕒 6 when</span></div></div>
+            <div class="ui-sub" style="text-align:left;margin:4px 0 0">CLEAN MODE</div>
+            <div class="chips"><span class="chip" style="color:var(--cyan);border-color:var(--cyan)">Share-safe</span><span class="chip o" style="color:var(--muted);border-color:var(--line);background:none">Location only</span><span class="chip" style="color:var(--muted);border-color:var(--line);background:none">Pixels only</span></div>
+            <div class="ui-row"><div class="ui-thumb"></div><div class="ui-meta"><b>IMG_20261018_193844.jpg</b>JPEG · GPS position · Camera serial<br><span class="pill h">HIGH</span></div></div>
+            <div class="ui-row"><div class="ui-thumb b"></div><div class="ui-meta"><b>IMG_20261017_081202.jpg</b>JPEG · GPS position · Taken<br><span class="pill h">HIGH</span></div></div>
+            <div class="ui-row"><div class="ui-thumb c"></div><div class="ui-meta"><b>Screenshot_2026…png</b>PNG · Software<br><span class="pill m">MEDIUM</span></div></div>
+            <div class="ui-btn p" style="margin-top:auto">✔ CLEAN 3 PHOTOS</div>
+          </div>
+          <div class="view">
+            <div class="ui-check">✔</div>
+            <div class="ui-title" style="color:var(--acid)">CLEAN</div>
+            <div class="ui-sub">27 findings removed from 3 photos · 41.2 KB of metadata</div>
+            <div class="ui-row"><div class="ui-thumb"></div><div class="ui-meta"><b>photo_7f3a21.jpg</b><span class="pill h">HIGH</span> <span class="ui-arrow">→</span> <span class="pill c">CLEAN</span></div></div>
+            <div class="ui-row"><div class="ui-thumb b"></div><div class="ui-meta"><b>photo_c09e4d.jpg</b><span class="pill h">HIGH</span> <span class="ui-arrow">→</span> <span class="pill c">CLEAN</span></div></div>
+            <div class="ui-row"><div class="ui-thumb c"></div><div class="ui-meta"><b>photo_51b8e0.png</b><span class="pill m">MEDIUM</span> <span class="ui-arrow">→</span> <span class="pill c">CLEAN</span></div></div>
+            <div class="ui-btn p" style="margin-top:auto">⇪ SHARE CLEAN COPIES</div>
+            <div class="ui-btn s">SAVE · REPLACE ORIGINALS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="compare">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">04 / WHY NOT JUST "REMOVE LOCATION"?</p>
+        <h2>Built-in switches miss <em>most of it.</em></h2>
+        <p>Share sheets with a "remove location" option clear the EXIF GPS tags. That's one item on a long list.</p>
+      </div>
+      <div class="reveal" style="overflow-x:auto">
+        <table class="compare">
+          <thead><tr><th>WHAT'S IN THE PHOTO</th><th>"REMOVE LOCATION" SWITCH</th><th class="us">CYBERMETA</th></tr></thead>
+          <tbody>
+            <tr><td>EXIF GPS position</td><td class="y">removed</td><td class="us y">removed</td></tr>
+            <tr><td>GPS copied into XMP by editors</td><td class="p">often kept</td><td class="us y">removed</td></tr>
+            <tr><td>City / country written by apps (IPTC, XMP)</td><td class="n">kept</td><td class="us y">removed</td></tr>
+            <tr><td>Camera body &amp; lens serial numbers</td><td class="n">kept</td><td class="us y">removed</td></tr>
+            <tr><td>Owner / artist / creator name</td><td class="n">kept</td><td class="us y">removed</td></tr>
+            <tr><td>Embedded thumbnail (the photo before you cropped it)</td><td class="n">kept</td><td class="us y">removed</td></tr>
+            <tr><td>Motion-photo video hidden after the image</td><td class="n">kept</td><td class="us y">removed</td></tr>
+            <tr><td>Capture time to the second</td><td class="n">kept</td><td class="us y">removed or shifted</td></tr>
+            <tr><td>File name like IMG_20261019_143022</td><td class="n">kept</td><td class="us y">randomised</td></tr>
+            <tr><td>Checks its own output</td><td class="n">no</td><td class="us y">every photo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="trust">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">05 / HOW YOU KNOW IT WORKED</p>
+        <h2>Scrubbed, then <em>checked by someone else.</em></h2>
+        <p>The engine is the same Rust code as the <a href="https://github.com/cybercoretech/cybermeta">cybermeta</a> command-line tool, compiled into the app.</p>
+      </div>
+      <div class="pipeline reveal">
+        <div class="pipe"><div class="n">1</div><h3>Split</h3><p>The file is cut into its blocks: picture data, EXIF, XMP, IPTC, colour profile, comments, thumbnails, trailers.</p></div>
+        <div class="pipe"><div class="n">2</div><h3>Rebuild</h3><p>A new file is assembled from the picture data alone, copied byte for byte. Nothing is decoded or re-encoded.</p></div>
+        <div class="pipe"><div class="n">3</div><h3>Keep only what you chose</h3><p>Rotation and colour profile go back in as brand-new blocks holding only those values.</p></div>
+        <div class="pipe"><div class="n">4</div><h3>Verify</h3><p>A second, independent parser reads the result. If anything else is still there, you get an error, never a leaky photo.</p></div>
+      </div>
+      <div class="stats reveal">
+        <div class="stat"><b data-count="0">0</b><span>network permissions. Your photos can't leave through it.</span></div>
+        <div class="stat"><b data-count="100" data-suffix="%">0</b><span>of the picture data copied, untouched.</span></div>
+        <div class="stat"><b data-count="9">0</b><span>kinds of leak detected, from GPS to hidden video.</span></div>
+        <div class="stat"><b data-count="82">0</b><span>CYBERGRID themes built in. Pick one in Settings.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">06 / INSTALL</p>
+        <h2>Signed APK. <em>One command.</em></h2>
+        <p>Cybermeta isn't on the Play Store. Releases are signed with the project's own key, and the installer checks both the checksum and the signing certificate.</p>
+      </div>
+      <div class="install reveal">
+        <div class="card">
+          <h3>⬇ On your phone</h3>
+          <p>Open this page on your Android phone, download the APK and tap it. Android asks once to allow installs from your browser.</p>
+          <a class="btn primary" href="https://github.com/cybercoretech/cybermeta-android-app/releases/latest/download/cybermeta.apk">DOWNLOAD CYBERMETA.APK</a>
+          <p style="margin-top:1rem"><a href="https://github.com/cybercoretech/cybermeta-android-app/releases/latest">Release notes ↗</a> · Android 11 or newer · arm64 / x86_64</p>
+          <div class="fingerprint">Signing certificate SHA-256<br><b>88:39:05:95:F5:FB:F1:71:DC:03:D0:40:AB:C8:ED:C2:A7:FB:9E:97:33:20:B3:C4:BB:E7:25:D4:13:9B:28:3C</b></div>
+        </div>
+        <div class="card">
+          <h3>⌘ From a terminal</h3>
+          <div class="tabs" role="tablist">
+            <button class="tab on" type="button" data-cmd="curl">CURL INSTALL</button>
+            <button class="tab" type="button" data-cmd="manual">MANUAL + VERIFY</button>
+            <button class="tab" type="button" data-cmd="adb">ADB</button>
+          </div>
+          <div id="cmds"></div>
+          <p style="margin-top:.8rem;font-size:.9rem">Works on Linux, macOS and Termux. With a phone on <code>adb</code> it installs there; on Termux it opens Android's installer; otherwise it leaves the verified APK in the current folder.</p>
+        </div>
+      </div>
+      <div class="how reveal">
+        <article><b>01 / INSTALL</b><p>Download the APK on the phone (or use the command above with the phone plugged in) and confirm Android's prompt.</p></article>
+        <article><b>02 / ALLOW LOCATIONS</b><p>On first launch, tap <em>Allow</em> so Cybermeta can see the GPS it's about to remove. It's only for the report.</p></article>
+        <article><b>03 / STAY CURRENT</b><p>Add <code>github.com/cybercoretech/cybermeta-android-app</code> to <a href="https://github.com/ImranR98/Obtainium">Obtainium</a> for update notifications.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head reveal"><p class="eyebrow">07 / QUESTIONS</p><h2>Fine print, <em>in plain words.</em></h2></div>
+      <div class="faq reveal">
+        <details><summary>Does Cybermeta upload my photos anywhere?</summary><p>It can't. The app doesn't hold Android's INTERNET permission (it's explicitly removed in the manifest), so the system won't let it open a network connection. Photos are read, cleaned and handed back to the share sheet entirely on your phone.</p></details>
+        <details><summary>Does cleaning reduce quality?</summary><p>No. The compressed picture data is copied byte for byte into the new file; only the metadata blocks around it are left out. The one exception is HEIC/AVIF, which can't be cleaned that way yet: Cybermeta converts those to a high-quality JPEG (you can turn that off).</p></details>
+        <details><summary>Why does it ask for "media location" access?</summary><p>Android hides GPS from apps by default and hands them a copy with the coordinates zeroed. Without the permission the report would say "no location" for a photo that has one. The cleaned copy is safe either way; the permission only makes the report honest.</p></details>
+        <details><summary>What do the clean modes do?</summary><p><b>Share-safe</b> removes everything but keeps the colour profile and rotation. <b>Location only</b> removes GPS and named places and keeps the rest. <b>Anonymous camera</b> removes everything, then labels the photo "Generic Camera". <b>Pixels only</b> keeps nothing at all. <b>Shift dates</b> moves every timestamp by an offset you choose.</p></details>
+        <details><summary>My Samsung shoots motion photos. What happens to them?</summary><p>A motion photo is a JPEG with a short video glued on after the end of the image, and that video can carry its own location and audio. A full clean removes it and keeps the still photo. "Location only" warns you that it's still there.</p></details>
+        <details><summary>Can I overwrite my originals?</summary><p>Yes, but only through Android's own "allow Cybermeta to modify these photos" prompt, for the exact photos you picked. By default Cybermeta never touches originals: it shares or saves clean copies to Pictures/Cybermeta.</p></details>
+        <details><summary>Is there a desktop version?</summary><p>Yes: <a href="https://github.com/cybercoretech/cybermeta">cybermeta</a> is a TUI and CLI for Linux and macOS with the same engine, batch folders and a privacy audit. <code>curl -fsSL https://raw.githubusercontent.com/cybercoretech/cybermeta/main/install.sh | sh</code></p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card" id="modalCard">
+    <button class="modal-close" type="button" id="modalClose" aria-label="Close">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 108 108">
+    <path fill="none" stroke="var(--cyan)" stroke-opacity=".18" stroke-width="7" d="M36,33h36a6,6 0 0 1 6,6v30a6,6 0 0 1 -6,6h-36a6,6 0 0 1 -6,-6v-30a6,6 0 0 1 6,-6z"/>
+    <path fill="var(--panel)" d="M36,33h36a6,6 0 0 1 6,6v30a6,6 0 0 1 -6,6h-36a6,6 0 0 1 -6,-6v-30a6,6 0 0 1 6,-6z"/>
+    <path fill="var(--cyan)" fill-opacity=".55" d="M33.5,72.5L45,55L53,65L60,58L74.5,72.5Z"/>
+    <circle cx="43" cy="41.5" r="4" fill="var(--cyan)"/>
+    <path fill="none" stroke="var(--white)" stroke-width="3.2" d="M36,33h36a6,6 0 0 1 6,6v30a6,6 0 0 1 -6,6h-36a6,6 0 0 1 -6,-6v-30a6,6 0 0 1 6,-6z"/>
+    <rect x="21.5" y="46" width="41" height="6" rx="2.5" fill="var(--pink)"/>
+    <rect x="64" y="46.5" width="3" height="3" fill="var(--pink)"/><rect x="69" y="43.6" width="2.6" height="2.6" fill="var(--pink)" opacity=".8"/>
+    <rect x="74" y="47" width="2.2" height="2.2" fill="var(--pink)" opacity=".6"/><rect x="79" y="41.6" width="2.2" height="2.2" fill="var(--pink)" opacity=".4"/>
+  </symbol>
+</svg>
+
+<!-- Cybercore Tech contact block: one shared source for every site (cybercoretech.github.io/kit/contact.js + data/contact.json) -->
+<section class="cc-contact-band" aria-label="Contact Cybercore Tech" style="--acid:var(--cyan);width:min(1160px,calc(100% - 2.5rem));margin:4.5rem auto 0;padding:2.25rem 0 1.75rem;border-top:1px solid var(--line)">
+  <cybercore-contact repo="cybermeta-android-app" bare><a href="mailto:dev@cybercoretech.net">dev@cybercoretech.net</a></cybercore-contact>
+</section>
+<footer>
+  <div class="wrap">
+    <img src="assets/icon.svg" alt=""><span>Cybermeta for Android · MIT licensed · Cybercore Tech</span>
+    <div class="links">
+      <a href="https://github.com/cybercoretech/cybermeta-android-app">GitHub</a>
+      <a href="https://github.com/cybercoretech/cybermeta">cybermeta CLI</a>
+      <a href="https://github.com/cybercoretech/cybermeta-android-app/releases">Releases</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/lab.js"></script>
+<script type="module" src="https://cybercoretech.github.io/kit/contact.js"></script>
+</body>
+</html>

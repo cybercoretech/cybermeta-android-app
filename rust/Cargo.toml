@@ -1,0 +1,33 @@
+[package]
+name = "cybermeta-ffi"
+version = "0.1.0"
+edition = "2021"
+description = "UniFFI bridge from the cybermeta engine to the Cybermeta Android app"
+license = "MIT"
+publish = false
+
+[lib]
+name = "cybermeta_ffi"
+crate-type = ["cdylib", "lib"]
+
+[[bin]]
+# Generates the Kotlin bindings from the built library (Gradle runs it).
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+# The engine only: no TUI, no CLI. Pinned to a tag once cybermeta v0.3.0 is
+# released; until then the PR branch (Cargo.lock pins the exact commit).
+cybermeta = { git = "https://github.com/cybercoretech/cybermeta", branch = "feat/privacy-scrub", default-features = false }
+thiserror = "2"
+uniffi = { version = "0.32", features = ["cli"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+# Not stripped here: UniFFI reads its metadata from the symbols. AGP strips
+# the .so when it packages the APK.
+strip = false
+panic = "unwind"

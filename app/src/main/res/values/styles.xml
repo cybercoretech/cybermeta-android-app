@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Cybermeta" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">@color/void_bg</item>
+        <item name="android:colorAccent">@color/teal</item>
+    </style>
+</resources>

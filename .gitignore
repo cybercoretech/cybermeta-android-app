@@ -1,0 +1,15 @@
+.gradle/
+.kotlin/
+.idea/
+**/build/
+local.properties
+*.iml
+*.apk
+*.aab
+*.keystore
+*.jks
+artifacts/
+__pycache__/
+# Rust build output and the native libraries Gradle builds from it.
+rust/target/
+app/src/main/jniLibs/

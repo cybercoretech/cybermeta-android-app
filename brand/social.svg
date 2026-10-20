@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="g" cx="75%" cy="40%" r="70%"><stop offset="0" stop-color="#13261f"/><stop offset="1" stop-color="#040706"/></radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#2dd4bf" stroke-opacity=".07"/></pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <text x="70" y="120" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" letter-spacing="6" fill="#ff6b5c">CYBERMETA FOR ANDROID</text>
+  <text x="70" y="230" font-family="Space Grotesk, Inter, sans-serif" font-size="84" font-weight="700" fill="#eafaf5">Your photos talk.</text>
+  <text x="70" y="330" font-family="Space Grotesk, Inter, sans-serif" font-size="84" font-weight="700" fill="#eafaf5">Make them <tspan fill="#ff6b5c">stop.</tspan></text>
+  <text x="70" y="410" font-family="JetBrains Mono, monospace" font-size="24" fill="#7d9992">GPS · serials · names · times · hidden video</text>
+  <text x="70" y="452" font-family="JetBrains Mono, monospace" font-size="24" fill="#7d9992">found and removed, losslessly, on your phone.</text>
+  <g font-family="JetBrains Mono, monospace" font-size="20" font-weight="700" letter-spacing="2">
+    <rect x="70" y="510" width="300" height="52" rx="12" fill="none" stroke="#2dd4bf"/><text x="94" y="544" fill="#2dd4bf">✔ NO INTERNET</text>
+    <rect x="390" y="510" width="300" height="52" rx="12" fill="none" stroke="#2dd4bf"/><text x="414" y="544" fill="#2dd4bf">✔ VERIFIED CLEAN</text>
+  </g>
+  <g transform="translate(790 150) scale(3.4)">
+    <path fill="none" stroke="#2dd4bf" stroke-opacity=".18" stroke-width="7" d="M36,33h36a6,6 0 0 1 6,6v30a6,6 0 0 1 -6,6h-36a6,6 0 0 1 -6,-6v-30a6,6 0 0 1 6,-6z"/>
+    <path fill="#0e1614" d="M36,33h36a6,6 0 0 1 6,6v30a6,6 0 0 1 -6,6h-36a6,6 0 0 1 -6,-6v-30a6,6 0 0 1 6,-6z"/>
+    <path fill="#2dd4bf" fill-opacity=".55" d="M33.5,72.5L45,55L53,65L60,58L74.5,72.5Z"/>
+    <circle cx="43" cy="41.5" r="4" fill="#2dd4bf"/>
+    <path fill="none" stroke="#eafaf5" stroke-width="3.2" d="M36,33h36a6,6 0 0 1 6,6v30a6,6 0 0 1 -6,6h-36a6,6 0 0 1 -6,-6v-30a6,6 0 0 1 6,-6z"/>
+    <path fill="#ff6b5c" fill-opacity=".22" d="M23.5,42.5h40a5,5 0 0 1 5,5v3a5,5 0 0 1 -5,5h-40a5,5 0 0 1 -5,-5v-3a5,5 0 0 1 5,-5z"/>
+    <rect x="21.5" y="46" width="41" height="6" rx="2.5" fill="#ff6b5c"/>
+    <rect x="64" y="46.5" width="3" height="3" fill="#ff6b5c"/><rect x="69" y="43.6" width="2.6" height="2.6" fill="#ff6b5c" opacity=".9"/>
+    <rect x="74" y="47" width="2.2" height="2.2" fill="#ff6b5c" opacity=".8"/><rect x="79" y="41.6" width="2.2" height="2.2" fill="#ff6b5c" opacity=".6"/>
+    <rect x="83.2" y="37.8" width="1.8" height="1.8" fill="#ff6b5c" opacity=".4"/><rect x="70.6" y="51" width="2" height="2" fill="#2dd4bf" opacity=".8"/>
+    <rect x="80" y="49" width="1.6" height="1.6" fill="#2dd4bf" opacity=".53"/>
+  </g>
+</svg>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Scrubbed copies waiting to be shared; cleared on every new session. -->
+    <cache-path name="clean" path="clean/" />
+</paths>

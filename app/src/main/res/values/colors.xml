@@ -1,0 +1,5 @@
+<resources>
+    <!-- "Tag Redact", the cybermeta brand palette (the window behind the first frame). -->
+    <color name="void_bg">#070A09</color>
+    <color name="teal">#2DD4BF</color>
+</resources>
