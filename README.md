@@ -162,3 +162,5 @@ under the Cyber prefix; no affiliation with any external cybersecurity
 vendor or agency.
 
 Contact: dev@cybercoretech.net
+
+- Added version badge v0.2.0 to the landing page.
