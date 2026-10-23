@@ -303,7 +303,7 @@ dependencies = [
 [[package]]
 name = "cybermeta"
 version = "0.3.0"
-source = "git+https://github.com/cybercoretech/cybermeta?branch=feat%2Fprivacy-scrub#66785ea53e3d60888fbd4b396a58ac7da85875a4"
+source = "git+https://github.com/cybercoretech/cybermeta?tag=v0.3.0#85090240311c90abbe763b013edcc7261212266a"
 dependencies = [
  "anyhow",
  "chrono",

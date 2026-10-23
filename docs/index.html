@@ -26,9 +26,9 @@
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top"><img src="assets/icon.svg" alt=""><span>CYBERMETA<br><small>FOR ANDROID</small></span></a>
-    <p class="version-badge">Version <strong>v0.2.0</strong></p>
+    <p class="version-badge">Version <strong>v0.3.0</strong></p>
     <nav class="main-nav" aria-label="Main navigation">
-      <a href="#leaks">LEAKS</a><a href="#lab">LIVE LAB</a><a href="#app">THE APP</a><a href="#trust">TRUST</a><a href="#install">INSTALL</a>
+      <a href="#leaks">LEAKS</a><a href="#lab">LIVE LAB</a><a href="#app">THE APP</a><a href="#trust">TRUST</a><a href="#limitations">LIMITATIONS</a><a href="#install">INSTALL</a>
     </nav>
     <div class="theme-picker">
       <span class="theme-label">CYBERGRID</span>
@@ -206,6 +206,21 @@
     </div>
   </section>
 
+  <section class="section" id="limitations">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">KNOWN LIMITATIONS</p>
+        <h2>Know what the <em>cleaner can do.</em></h2>
+        <p>Cybermeta can audit more formats than it can safely rebuild. The app reports when a format or file needs special handling.</p>
+      </div>
+      <div class="faq reveal">
+        <details open><summary>HEIC, AVIF, TIFF and JPEG XL</summary><p>These formats can be audited, but the engine cannot scrub them losslessly yet. Turn on conversion to create a JPEG when Android can decode the source; conversion re-encodes the image and may not be available for every file.</p></details>
+        <details><summary>Editing tags in some WebP files</summary><p>Scrubbing WebP metadata is supported. Editing tags, including Anonymous Camera, can fail on some WebP files depending on their header structure; this does not affect scrubbing.</p></details>
+        <details><summary>Motion photos in Location only mode</summary><p>The embedded video track may contain its own GPS data. Location only keeps that track, so use a full scrub to remove the video and its metadata.</p></details>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="install">
     <div class="wrap">
       <div class="section-head reveal">
@@ -245,10 +260,10 @@
       <div class="section-head reveal"><p class="eyebrow">07 / QUESTIONS</p><h2>Fine print, <em>in plain words.</em></h2></div>
       <div class="faq reveal">
         <details><summary>Does Cybermeta upload my photos anywhere?</summary><p>It can't. The app doesn't hold Android's INTERNET permission (it's explicitly removed in the manifest), so the system won't let it open a network connection. Photos are read, cleaned and handed back to the share sheet entirely on your phone.</p></details>
-        <details><summary>Does cleaning reduce quality?</summary><p>No. The compressed picture data is copied byte for byte into the new file; only the metadata blocks around it are left out. The one exception is HEIC/AVIF, which can't be cleaned that way yet: Cybermeta converts those to a high-quality JPEG (you can turn that off).</p></details>
+        <details><summary>Does cleaning reduce quality?</summary><p>For JPEG, PNG and WebP, the compressed picture data is copied byte for byte into the new file. HEIC and AVIF require conversion to JPEG when conversion is enabled, which re-encodes the image. TIFF and JPEG XL cannot currently be scrubbed by the app.</p></details>
         <details><summary>Why does it ask for "media location" access?</summary><p>Android hides GPS from apps by default and hands them a copy with the coordinates zeroed. Without the permission the report would say "no location" for a photo that has one. The cleaned copy is safe either way; the permission only makes the report honest.</p></details>
         <details><summary>What do the clean modes do?</summary><p><b>Share-safe</b> removes everything but keeps the colour profile and rotation. <b>Location only</b> removes GPS and named places and keeps the rest. <b>Anonymous camera</b> removes everything, then labels the photo "Generic Camera". <b>Pixels only</b> keeps nothing at all. <b>Shift dates</b> moves every timestamp by an offset you choose.</p></details>
-        <details><summary>My Samsung shoots motion photos. What happens to them?</summary><p>A motion photo is a JPEG with a short video glued on after the end of the image, and that video can carry its own location and audio. A full clean removes it and keeps the still photo. "Location only" warns you that it's still there.</p></details>
+        <details><summary>My Samsung shoots motion photos. What happens to them?</summary><p>A motion photo is a JPEG with a short video glued on after the end of the image. A full scrub removes that video and keeps the still photo. Location only keeps the video, which may carry its own GPS data, so use a full scrub when you need that removed.</p></details>
         <details><summary>Can I overwrite my originals?</summary><p>Yes, but only through Android's own "allow Cybermeta to modify these photos" prompt, for the exact photos you picked. By default Cybermeta never touches originals: it shares or saves clean copies to Pictures/Cybermeta.</p></details>
         <details><summary>What is a ghost thumbnail or cropping leak?</summary><p>When you crop a photo in a gallery or editing app to remove a face, address, or sensitive detail, the app often saves the cropped image but leaves the full-frame original thumbnail inside EXIF IFD1. Anyone who extracts that thumbnail can see what you cropped out. Cybermeta audits embedded thumbnails, detects aspect ratio mismatches, displays a side-by-side comparison, and scrubs the thumbnail completely.</p></details>
         <details><summary>How does Cybermeta show city and country without internet?</summary><p>Cybermeta bundles an ultra-compact offline database of ~34,000 world cities (GeoNames cities15000) directly inside the app. When coordinates are detected, an on-device nearest-neighbor search resolves the locality in under 2 milliseconds without sending a single byte across the network.</p></details>

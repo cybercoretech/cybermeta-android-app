@@ -163,4 +163,8 @@ vendor or agency.
 
 Contact: dev@cybercoretech.net
 
-- Added version badge v0.2.0 to the landing page.
+## Recent changes
+
+- **v0.3.0:** Pin the Rust engine to its v0.3.0 tag, set the Android version
+  to 0.3.0, and document supported formats and known limitations.
+- **v0.2.0:** Add the version badge to the landing page.

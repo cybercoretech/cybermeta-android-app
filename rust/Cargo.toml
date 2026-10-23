@@ -17,9 +17,8 @@ path = "uniffi-bindgen.rs"
 
 [dependencies]
 anyhow = "1.0.104"
-# The engine only: no TUI, no CLI. Pinned to a tag once cybermeta v0.3.0 is
-# released; until then the PR branch (Cargo.lock pins the exact commit).
-cybermeta = { git = "https://github.com/cybercoretech/cybermeta", branch = "feat/privacy-scrub", default-features = false }
+# The engine only: no TUI, no CLI. Pin to the stable v0.3.0 engine release.
+cybermeta = { git = "https://github.com/cybercoretech/cybermeta", tag = "v0.3.0", default-features = false }
 thiserror = "2"
 uniffi = { version = "0.32", features = ["cli"] }
 

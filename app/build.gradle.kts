@@ -11,8 +11,8 @@ val releaseKeyAlias = System.getenv("CYBERMETA_RELEASE_KEY_ALIAS")
 val releaseKeyPassword = System.getenv("CYBERMETA_RELEASE_KEY_PASSWORD")
 val releaseSigningValues = listOf(releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword)
 val releaseSigningConfigured = releaseSigningValues.all { !it.isNullOrBlank() }
-val cybermetaVersionCode = providers.gradleProperty("cybermetaVersionCode").orNull?.toIntOrNull() ?: 100
-val cybermetaVersionName = providers.gradleProperty("cybermetaVersionName").orNull ?: "0.1.0"
+val cybermetaVersionCode = providers.gradleProperty("cybermetaVersionCode").orNull?.toIntOrNull() ?: 300
+val cybermetaVersionName = providers.gradleProperty("cybermetaVersionName").orNull ?: "0.3.0"
 if (releaseSigningValues.any { !it.isNullOrBlank() } && !releaseSigningConfigured) {
     throw GradleException("Release signing requires all CYBERMETA_RELEASE_* environment variables.")
 }

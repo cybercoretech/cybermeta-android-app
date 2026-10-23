@@ -77,7 +77,7 @@ fun SettingsScreen(s: UiState, vm: AppModel, actions: Actions) {
                 )
                 ToggleRow(
                     "Convert HEIC and other formats",
-                    "HEIC/AVIF can't be cleaned losslessly yet. Convert them to a high-quality JPEG first (re-encodes the picture).",
+                    "Unsupported formats can't be cleaned losslessly yet. Convert them to a high-quality JPEG when Android can decode them (re-encodes the picture).",
                     s.convertUnsupported, vm::setConvertUnsupported,
                 )
             }
