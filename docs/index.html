@@ -114,8 +114,8 @@
           <p>Cybermeta sits in your share sheet. Send photos to it from Gallery or Photos, see the report, and send clean copies on: to a chat, an email, a marketplace listing.</p>
         </div>
         <div class="steps reveal" id="steps">
-          <div class="step active" data-view="0"><b>01</b><div><h3>Pick or share photos</h3><p>Up to 100 at once, from the photo picker, your files, or any app's share button.</p></div></div>
-          <div class="step" data-view="1"><b>02</b><div><h3>See what they give away</h3><p>A risk badge per photo, grouped findings, GPS shown as the pin a stranger could drop.</p></div></div>
+          <div class="step active" data-view="0"><b>01</b><div><h3>Pick, share, or 1-tap tile</h3><p>Up to 100 at once from the photo picker, your files, or the Quick Settings pull-down tile to clean your latest camera shot.</p></div></div>
+          <div class="step" data-view="1"><b>02</b><div><h3>See what they give away</h3><p>Grouped findings, ghost thumbnail cropping leak detection, and offline reverse-geocoding without network access.</p></div></div>
           <div class="step" data-view="2"><b>03</b><div><h3>Clean and send</h3><p>Five modes: Share-safe, Location only, Anonymous camera, Pixels only, Shift dates. Then share, save, or replace the originals.</p></div></div>
         </div>
       </div>
@@ -249,6 +249,9 @@
         <details><summary>What do the clean modes do?</summary><p><b>Share-safe</b> removes everything but keeps the colour profile and rotation. <b>Location only</b> removes GPS and named places and keeps the rest. <b>Anonymous camera</b> removes everything, then labels the photo "Generic Camera". <b>Pixels only</b> keeps nothing at all. <b>Shift dates</b> moves every timestamp by an offset you choose.</p></details>
         <details><summary>My Samsung shoots motion photos. What happens to them?</summary><p>A motion photo is a JPEG with a short video glued on after the end of the image, and that video can carry its own location and audio. A full clean removes it and keeps the still photo. "Location only" warns you that it's still there.</p></details>
         <details><summary>Can I overwrite my originals?</summary><p>Yes, but only through Android's own "allow Cybermeta to modify these photos" prompt, for the exact photos you picked. By default Cybermeta never touches originals: it shares or saves clean copies to Pictures/Cybermeta.</p></details>
+        <details><summary>What is a ghost thumbnail or cropping leak?</summary><p>When you crop a photo in a gallery or editing app to remove a face, address, or sensitive detail, the app often saves the cropped image but leaves the full-frame original thumbnail inside EXIF IFD1. Anyone who extracts that thumbnail can see what you cropped out. Cybermeta audits embedded thumbnails, detects aspect ratio mismatches, displays a side-by-side comparison, and scrubs the thumbnail completely.</p></details>
+        <details><summary>How does Cybermeta show city and country without internet?</summary><p>Cybermeta bundles an ultra-compact offline database of ~34,000 world cities (GeoNames cities15000) directly inside the app. When coordinates are detected, an on-device nearest-neighbor search resolves the locality in under 2 milliseconds without sending a single byte across the network.</p></details>
+        <details><summary>How does the Quick Settings tile work?</summary><p>You can add the "Clean Latest" tile to your Android notification shade. Tapping it queries the most recent camera capture from your local MediaStore, opens Cybermeta, audits and scrubs it, and lets you immediately share or save the clean copy in seconds.</p></details>
         <details><summary>Is there a desktop version?</summary><p>Yes: <a href="https://github.com/cybercoretech/cybermeta">cybermeta</a> is a TUI and CLI for Linux and macOS with the same engine, batch folders and a privacy audit. <code>curl -fsSL https://raw.githubusercontent.com/cybercoretech/cybermeta/main/install.sh | sh</code></p></details>
       </div>
     </div>

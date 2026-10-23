@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.HighQuality
 import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Share
@@ -302,7 +304,22 @@ private fun PhotoRow(item: Item, onClick: () -> Unit, onRemove: () -> Unit) {
                         color = P.muted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(Modifier.height(4.dp))
-                    RiskBadge(item.report.risk, short = true)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        RiskBadge(item.report.risk, short = true)
+                        if (item.ghostThumb?.isCroppingLeak == true) {
+                            Text(
+                                "CROPPED LEAK",
+                                Modifier
+                                    .clip(RoundedCornerShape(50))
+                                    .background(P.red.copy(alpha = .16f))
+                                    .border(1.dp, P.red.copy(alpha = .8f), RoundedCornerShape(50))
+                                    .padding(horizontal = 7.dp, vertical = 2.dp),
+                                color = P.red,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -353,6 +370,9 @@ fun DetailScreen(s: UiState, actions: Actions) {
         if (item.locationHidden && report.gps == null) {
             item { Panel(accent = P.orange) { Text("Android hid this photo's location from Cybermeta. Allow media location on the home screen to see it.", color = P.orange, fontSize = 13.sp) } }
         }
+        item.ghostThumb?.let { ghost ->
+            item { GhostThumbnailCard(item, ghost) }
+        }
         report.gps?.let { g ->
             item {
                 Panel(accent = P.red) {
@@ -360,6 +380,11 @@ fun DetailScreen(s: UiState, actions: Actions) {
                         Icon(categoryIcon("location"), null, tint = P.red)
                         Spacer(Modifier.width(8.dp))
                         Text("This photo says where you were", fontWeight = FontWeight.Bold, color = P.red)
+                    }
+                    item.place?.let { place ->
+                        Text(place.formatted(), style = MaterialTheme.typography.titleMedium, color = P.fg, modifier = Modifier.padding(top = 4.dp))
+                        Text("Near ${place.name} (~${"%.1f".format(place.distanceKm)} km) · Resolved offline without internet", color = P.muted, fontSize = 12.sp)
+                        Spacer(Modifier.height(4.dp))
                     }
                     Text("%.6f, %.6f".format(g.latitude, g.longitude), fontFamily = Mono, fontSize = 22.sp, color = P.fg)
                     Text("Anyone you send the original to can put a pin on this spot.", color = P.muted, fontSize = 13.sp)
@@ -412,6 +437,85 @@ private fun FindingGroup(category: String, findings: List<Finding>) {
                 Text(f.value, color = severityColor(P, f.severity).copy(alpha = .9f), fontSize = 13.sp, fontFamily = Mono, maxLines = 3, overflow = TextOverflow.Ellipsis)
             }
         }
+    }
+}
+
+@Composable
+private fun GhostThumbnailCard(item: Item, ghost: GhostThumbnail) {
+    val accent = if (ghost.isCroppingLeak) P.red else P.orange
+    Panel(accent = accent) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(if (ghost.isCroppingLeak) Icons.Outlined.Warning else Icons.Outlined.PhotoCamera, null, tint = accent)
+            Spacer(Modifier.width(8.dp))
+            Text(
+                if (ghost.isCroppingLeak) "Cropping leak detected" else "Embedded preview thumbnail",
+                fontWeight = FontWeight.Bold,
+                color = accent,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                if (ghost.isCroppingLeak) "LEAK" else "PREVIEW",
+                color = accent,
+                fontFamily = Mono,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+            )
+        }
+        Text(ghost.description, color = P.muted, fontSize = 13.sp)
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("CURRENT CROP", color = P.muted, fontSize = 10.sp, fontFamily = Mono)
+                Spacer(Modifier.height(4.dp))
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(P.bg)
+                        .border(1.dp, P.line, RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (item.thumb != null) {
+                        Image(item.thumb, "Current image", contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
+                    }
+                }
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    if (ghost.mainWidth > 0) "${ghost.mainWidth}×${ghost.mainHeight}" else "photo",
+                    color = P.muted,
+                    fontSize = 11.sp,
+                    fontFamily = Mono,
+                )
+            }
+            Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("EMBEDDED THUMB", color = accent, fontSize = 10.sp, fontFamily = Mono)
+                Spacer(Modifier.height(4.dp))
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(P.bg)
+                        .border(1.dp, accent.copy(alpha = 0.6f), RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (ghost.bitmap != null) {
+                        Image(ghost.bitmap, "Embedded thumbnail", contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
+                    } else {
+                        Text("${ghost.width}×${ghost.height}", color = accent, fontSize = 11.sp, fontFamily = Mono)
+                    }
+                }
+                Spacer(Modifier.height(2.dp))
+                Text("${ghost.width}×${ghost.height}", color = accent, fontSize = 11.sp, fontFamily = Mono)
+            }
+        }
+        Spacer(Modifier.height(2.dp))
+        Text(
+            "Cybermeta strips this hidden preview completely without touching your image pixels.",
+            color = P.fg,
+            fontSize = 12.sp,
+        )
     }
 }
 

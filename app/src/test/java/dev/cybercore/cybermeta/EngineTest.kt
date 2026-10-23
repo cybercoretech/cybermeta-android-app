@@ -86,6 +86,35 @@ class EngineTest {
     }
 
     @Test
+    fun ghostThumbnailDetectsCroppingLeak() {
+        val bytes = fixture("ghost_leak.jpg")
+        val ghost = PhotoIO.findGhostThumbnail(bytes)
+        assertNotNull(ghost)
+        assertEquals(48, ghost!!.width)
+        assertEquals(32, ghost.height)
+        assertEquals(32, ghost.mainWidth)
+        assertEquals(32, ghost.mainHeight)
+        assertTrue("Expected cropping leak flag", ghost.isCroppingLeak)
+        assertTrue(ghost.description.contains("mismatch"))
+
+        // When scrubbed, the ghost thumbnail is completely removed
+        val cleaned = Engine.scrub(bytes, KeepOptions(icc = true, orientation = true, date = false))
+        val afterGhost = PhotoIO.findGhostThumbnail(cleaned.bytes)
+        assertNull("Ghost thumbnail should be stripped", afterGhost)
+    }
+
+    @Test
+    fun offlineGeocoderResolvesCoordinates() {
+        val stream = javaClass.classLoader!!.getResourceAsStream("places.bin")!!
+        OfflineGeocoder.init(stream)
+        val place = OfflineGeocoder.findNearest(45.5, -122.6)
+        assertNotNull(place)
+        assertEquals("US", place!!.countryCode)
+        assertTrue(place.distanceKm < 10.0)
+        assertTrue("Expected Oregon, got ${place.formatted()}", place.formatted().contains("OR"))
+    }
+
+    @Test
     fun palettesAreGenerated() {
         val all = PaletteFamilies.flatMap { it.second }
         assertEquals(82, all.size)

@@ -2,4 +2,6 @@
     <string name="app_name">Cybermeta</string>
     <string name="share_target">Clean with Cybermeta</string>
     <string name="share_clean">Share clean copies</string>
+    <string name="tile_clean_label">Clean Latest</string>
+    <string name="tile_clean_desc">Clean most recent camera photo</string>
 </resources>

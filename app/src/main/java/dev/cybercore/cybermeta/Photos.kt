@@ -30,6 +30,22 @@ class Loaded(
 )
 
 /**
+ * An embedded preview found inside EXIF IFD1 / JFIF.
+ * Frequently contains the full uncropped image even after the user
+ * cropped the photo, or reveals unblurred details from the original camera shot.
+ */
+data class GhostThumbnail(
+    val bytes: ByteArray,
+    val bitmap: ImageBitmap?,
+    val width: Int,
+    val height: Int,
+    val mainWidth: Int,
+    val mainHeight: Int,
+    val isCroppingLeak: Boolean,
+    val description: String,
+)
+
+/**
  * Reading, writing and sharing photos. Everything goes through content
  * URIs: the app has no storage permission and no network permission.
  */
@@ -78,6 +94,83 @@ object PhotoIO {
                 if (c.moveToFirst()) c.getString(0) else null
             }
         }.getOrNull() ?: uri.lastPathSegment ?: "photo"
+
+    /** Parse JPEG dimensions directly from frame headers (SOF0/SOF2). Pure JVM-compatible. */
+    fun jpegDimensions(bytes: ByteArray): Pair<Int, Int>? {
+        if (bytes.size < 4 || bytes[0] != 0xFF.toByte() || bytes[1] != 0xD8.toByte()) return null
+        var i = 2
+        while (i + 8 < bytes.size) {
+            if (bytes[i] != 0xFF.toByte()) { i++; continue }
+            val marker = bytes[i + 1].toInt() and 0xFF
+            if (marker == 0xD9 || marker == 0xDA) break // EOI or SOS
+            val len = ((bytes[i + 2].toInt() and 0xFF) shl 8) or (bytes[i + 3].toInt() and 0xFF)
+            if (len < 2 || i + 2 + len > bytes.size) break
+            // SOF0 (0xC0), SOF1 (0xC1), SOF2 (0xC2)
+            if (marker in 0xC0..0xC3 && i + 8 < bytes.size) {
+                val h = ((bytes[i + 5].toInt() and 0xFF) shl 8) or (bytes[i + 6].toInt() and 0xFF)
+                val w = ((bytes[i + 7].toInt() and 0xFF) shl 8) or (bytes[i + 8].toInt() and 0xFF)
+                return Pair(w, h)
+            }
+            i += 2 + len
+        }
+        return null
+    }
+
+    /**
+     * Inspect embedded EXIF / JFIF thumbnails. If the main photo's aspect ratio
+     * deviates from the thumbnail's ratio by >8%, the photo was cropped while the
+     * embedded thumbnail still exposes the uncropped scene.
+     */
+    fun findGhostThumbnail(bytes: ByteArray): GhostThumbnail? {
+        val thumbBytes = runCatching {
+            val exif = androidx.exifinterface.media.ExifInterface(java.io.ByteArrayInputStream(bytes))
+            if (exif.hasThumbnail()) exif.thumbnailBytes else null
+        }.getOrNull() ?: return null
+
+        val thumbDim = jpegDimensions(thumbBytes) ?: return null
+        val (thumbW, thumbH) = thumbDim
+
+        val mainDim = jpegDimensions(bytes) ?: runCatching {
+            val src = ImageDecoder.createSource(ByteBuffer.wrap(bytes))
+            var size: Pair<Int, Int>? = null
+            ImageDecoder.decodeBitmap(src) { _, info, _ ->
+                size = Pair(info.size.width, info.size.height)
+            }
+            size
+        }.getOrNull()
+
+        val mainW = mainDim?.first ?: 0
+        val mainH = mainDim?.second ?: 0
+
+        val isCropLeak = if (mainW > 0 && mainH > 0 && thumbW > 0 && thumbH > 0) {
+            val mainMax = maxOf(mainW, mainH).toDouble()
+            val mainMin = minOf(mainW, mainH).toDouble()
+            val thumbMax = maxOf(thumbW, thumbH).toDouble()
+            val thumbMin = minOf(thumbW, thumbH).toDouble()
+            val mainRatio = mainMax / mainMin
+            val thumbRatio = thumbMax / thumbMin
+            kotlin.math.abs(mainRatio - thumbRatio) / mainRatio > 0.08
+        } else {
+            false
+        }
+
+        val desc = if (isCropLeak) {
+            "Aspect ratio mismatch (${thumbW}×${thumbH} thumbnail vs ${mainW}×${mainH} photo). This photo was cropped, but the embedded thumbnail still preserves the original uncropped scene."
+        } else {
+            "Embedded preview (${thumbW}×${thumbH}). May reveal original, unedited, or unblurred camera details."
+        }
+
+        return GhostThumbnail(
+            bytes = thumbBytes,
+            bitmap = thumbnail(thumbBytes),
+            width = thumbW,
+            height = thumbH,
+            mainWidth = mainW,
+            mainHeight = mainH,
+            isCroppingLeak = isCropLeak,
+            description = desc,
+        )
+    }
 
     /** A small preview, rotated upright. HEIC decodes too. */
     fun thumbnail(bytes: ByteArray, maxSide: Int = 480): ImageBitmap? = runCatching {

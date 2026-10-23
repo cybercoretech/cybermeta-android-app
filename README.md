@@ -24,12 +24,12 @@ reports what it gives away, grouped by how much it reveals:
 
 | | Finding | Examples |
 |---|---|---|
-| 📍 | **Where you were** | EXIF GPS, GPS copied into XMP, IPTC city/country |
+| 📍 | **Where you were** | EXIF GPS, GPS copied into XMP, IPTC city/country, offline reverse-geocoded place |
 | 👤 | **Who you are** | Camera owner, artist, XMP creator and contact details, IPTC by-line |
 | 🎞️ | **Hidden data** | Motion-photo video stored after the image, Multi-Picture data |
 | 📷 | **Your camera** | Body/lens serial numbers, unique image ID, maker notes, make/model |
 | 🕒 | **When** | Capture time to the second, time zone, edit times |
-| 🖼️ | **Hidden preview** | Embedded thumbnails that can still show what you cropped out |
+| 🖼️ | **Hidden preview** | Embedded thumbnails, including uncropped original previews (ghost thumbnails) |
 | ✍️ | **Captions and comments** | Descriptions, comments, PNG text |
 | 🧰 | **Software and settings** | Editing apps, exposure settings |
 
@@ -66,6 +66,15 @@ It then makes clean copies to share, save, or write over the originals.
 - 📍 **Honest reports.** Android hides GPS from apps unless they're allowed
   *media location*. Cybermeta asks for that permission, so it can show you
   the location it's about to remove, and warns you when it can't see it.
+- 🗺️ **Embedded offline geocoding.** Resolves coordinates to city, region,
+  and country using an embedded ~900 KB dataset of 34,000+ world cities
+  (GeoNames), fully on-device in under 2ms without sending network packets.
+- 🖼️ **Ghost thumbnail detection.** Phones often leave the full uncropped
+  scene inside the EXIF IFD1 preview when you crop an image. Cybermeta
+  detects aspect ratio mismatches, flags the leak with a side-by-side
+  comparison, and scrubs the thumbnail.
+- ⚡ **Quick Settings tile.** One-tap *Clean Latest* tile in the Android
+  notification shade immediately audits and cleans your most recent shot.
 
 ## 📦 Install
 

@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        OfflineGeocoder.init(this)
         if (savedInstanceState == null) handle(intent)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -88,14 +89,43 @@ class MainActivity : ComponentActivity() {
         handle(intent)
     }
 
-    /** Photos shared in from Gallery, Photos, a file manager, ... */
+    /** Photos shared in from Gallery, Photos, a file manager, or Quick Settings tile. */
     private fun handle(intent: Intent?) {
+        if (intent?.action == CleanTileService.ACTION_CLEAN_LATEST) {
+            cleanLatestPhoto()
+            return
+        }
         val uris = when (intent?.action) {
             Intent.ACTION_SEND -> listOfNotNull(IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java))
             Intent.ACTION_SEND_MULTIPLE -> IntentCompat.getParcelableArrayListExtra(intent, Intent.EXTRA_STREAM, Uri::class.java).orEmpty()
             else -> return
         }
         vm.open(uris, fromShare = true)
+    }
+
+    private fun cleanLatestPhoto() {
+        val projection = arrayOf(MediaStore.Images.Media._ID)
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+        val uri = runCatching {
+            contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                sortOrder,
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val id = cursor.getLong(0)
+                    android.content.ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                } else null
+            }
+        }.getOrNull()
+
+        if (uri != null) {
+            vm.open(listOf(uri), fromShare = false)
+        } else {
+            vm.note("No camera photos found.")
+        }
     }
 
     private fun openShareSheet(uris: List<Uri>) {

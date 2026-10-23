@@ -37,6 +37,8 @@ data class Item(
     val name: String,
     val report: Report? = null,
     val thumb: ImageBitmap? = null,
+    val ghostThumb: GhostThumbnail? = null,
+    val place: PlaceMatch? = null,
     val loading: Boolean = true,
     val error: String? = null,
     /** Android hid GPS from us (no media-location permission). */
@@ -144,8 +146,74 @@ class AppModel(app: Application) : AndroidViewModel(app) {
             runCatching {
                 val loaded = PhotoIO.read(ctx, item.uri)
                 originals[item.id] = loaded.bytes
-                val report = Engine.audit(loaded.bytes)
-                item.copy(report = report, thumb = PhotoIO.thumbnail(loaded.bytes), loading = false, locationHidden = loaded.locationHidden)
+                val baseReport = Engine.audit(loaded.bytes)
+                val ghost = PhotoIO.findGhostThumbnail(loaded.bytes)
+                val report = if (ghost?.isCroppingLeak == true) {
+                    val findings = baseReport.findings.map { f ->
+                        if (f.category == "thumbnail") {
+                            uniffi.cybermeta_ffi.Finding(
+                                severity = "high",
+                                category = "thumbnail",
+                                source = f.source,
+                                label = "Ghost thumbnail (cropping leak)",
+                                value = ghost.description,
+                            )
+                        } else f
+                    }.let { list ->
+                        if (list.none { it.category == "thumbnail" }) {
+                            list + uniffi.cybermeta_ffi.Finding(
+                                severity = "high",
+                                category = "thumbnail",
+                                source = "EXIF",
+                                label = "Ghost thumbnail (cropping leak)",
+                                value = ghost.description,
+                            )
+                        } else list
+                    }
+                    uniffi.cybermeta_ffi.Report(
+                        format = baseReport.format,
+                        formatName = baseReport.formatName,
+                        risk = "high",
+                        findings = findings,
+                        blocks = baseReport.blocks,
+                        gps = baseReport.gps,
+                        scrubbable = baseReport.scrubbable,
+                        damaged = baseReport.damaged,
+                    )
+                } else {
+                    baseReport
+                }
+                OfflineGeocoder.init(ctx)
+                val place = report.gps?.let { g -> OfflineGeocoder.findNearest(g.latitude, g.longitude) }
+                val finalReport = if (place != null) {
+                    val locationFinding = uniffi.cybermeta_ffi.Finding(
+                        severity = "high",
+                        category = "location",
+                        source = "GPS",
+                        label = "Resolved location (offline)",
+                        value = "${place.formatted()} (~${"%.1f".format(place.distanceKm)} km)",
+                    )
+                    uniffi.cybermeta_ffi.Report(
+                        format = report.format,
+                        formatName = report.formatName,
+                        risk = report.risk ?: "high",
+                        findings = listOf(locationFinding) + report.findings,
+                        blocks = report.blocks,
+                        gps = report.gps,
+                        scrubbable = report.scrubbable,
+                        damaged = report.damaged,
+                    )
+                } else {
+                    report
+                }
+                item.copy(
+                    report = finalReport,
+                    thumb = PhotoIO.thumbnail(loaded.bytes),
+                    ghostThumb = ghost,
+                    place = place,
+                    loading = false,
+                    locationHidden = loaded.locationHidden,
+                )
             }.getOrElse { item.copy(loading = false, error = it.userMessage()) }
         }
         replace(update)

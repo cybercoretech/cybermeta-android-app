@@ -109,6 +109,7 @@ android {
     buildFeatures { compose = true; buildConfig = true }
     packaging { jniLibs { useLegacyPackaging = false } }
     testOptions {
+        unitTests.isReturnDefaultValues = true
         unitTests.all {
             it.systemProperty("jna.library.path", rustTarget.resolve("release").absolutePath)
             it.dependsOn(cargoHost)
@@ -131,6 +132,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
     implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     // UniFFI's Kotlin bindings call the Rust library through JNA.
     implementation("net.java.dev.jna:jna:5.17.0@aar")
